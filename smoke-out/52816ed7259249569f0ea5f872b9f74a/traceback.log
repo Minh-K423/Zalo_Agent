@@ -1,0 +1,13 @@
+Traceback (most recent call last):
+  File "D:\Zalo AIC Data\src\zalo_aic_data\kaggle_smoke.py", line 384, in run_smoke
+    report["asset_checks"] = validate_assets(Path(config.model_path), manifest, config)
+                             ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Zalo AIC Data\src\zalo_aic_data\kaggle_smoke.py", line 132, in validate_assets
+    require_file(path, "model/tokenizer metadata")
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Zalo AIC Data\src\zalo_aic_data\kaggle_smoke.py", line 118, in require_file
+    raise SmokeError(
+    ...<2 lines>...
+    )
+SmokeError: Missing or empty model/tokenizer metadata: missing-model\config.json. Attach the complete offline asset and check its mount path; no download fallback is enabled. See docs/kaggle.md.
+ 

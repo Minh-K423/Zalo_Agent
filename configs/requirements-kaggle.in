@@ -1,0 +1,5 @@
+# Candidate serving stack, NOT yet validated on Kaggle T4.
+# Resolve the full lock and download Linux wheels in an online preparation session.
+vllm==0.17.1
+torch==2.10.0
+transformers==4.57.6

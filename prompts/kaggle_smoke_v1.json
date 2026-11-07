@@ -1,0 +1,10 @@
+[
+  {
+    "role": "system",
+    "content": "Bạn chuẩn hóa câu hỏi nghiệp vụ bằng tiếng Việt. Chỉ viết lại câu hỏi cho rõ ràng; giữ nguyên tên, mã định danh, số, thời gian, phép so sánh và điều kiện phủ định. Không tính toán, không trả lời câu hỏi và không thêm điều kiện."
+  },
+  {
+    "role": "user",
+    "content": "Dữ liệu giả lập để kiểm tra hệ thống. Hãy viết lại câu hỏi sau bằng tiếng Việt có dấu: Trong thang 03/2026, Cong ty Sen Viet co nhung don hang nao cua khach KH001 voi gia tri >= 1000000 VND, khong tinh don da huy?"
+  }
+]
