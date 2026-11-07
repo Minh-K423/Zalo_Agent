@@ -26,6 +26,7 @@ import uuid
 from contextlib import suppress
 from dataclasses import asdict, dataclass, fields, replace
 from datetime import UTC, datetime
+from importlib.util import find_spec
 from pathlib import Path
 from typing import Any
 
@@ -357,16 +358,19 @@ class VllmRuntime:
         return output
 
     def prepare(self, wheels: Path, lock: Path) -> dict[str, str]:
-        self.command(
-            [sys.executable, "-m", "venv", str(self.run_dir / "env")],
-            log_path=self.run_dir / "bootstrap.log",
-        )
+        environment = str(self.python.parent.parent)
+        create = [sys.executable, "-m", "venv"]
+        pip = [str(self.python), "-m", "pip"]
+        # Kaggle's base pip can manage the venv even if ensurepip is broken.
+        if find_spec("pip") is not None:
+            create.append("--without-pip")
+            pip = [sys.executable, "-m", "pip", "--python", environment]
+        pip += ["--isolated", "--disable-pip-version-check"]
+        bootstrap_log = self.run_dir / "bootstrap.log"
+        self.command([*create, environment], log_path=bootstrap_log)
         self.command(
             [
-                str(self.python),
-                "-m",
-                "pip",
-                "--isolated",
+                *pip,
                 "install",
                 "--no-index",
                 "--only-binary=:all:",
@@ -374,9 +378,8 @@ class VllmRuntime:
                 str(wheels),
                 "--requirement",
                 str(lock),
-                "--disable-pip-version-check",
             ],
-            log_path=self.run_dir / "bootstrap.log",
+            log_path=bootstrap_log,
         )
         installed = json.loads(
             self.command(
@@ -401,10 +404,7 @@ class VllmRuntime:
             raise SmokeError(
                 f"Linux lock omitted installed dependencies: {sorted(unpinned)}."
             )
-        self.command(
-            [str(self.python), "-m", "pip", "check"],
-            log_path=self.run_dir / "bootstrap.log",
-        )
+        self.command([*pip, "check"], log_path=bootstrap_log)
         return installed
 
     def hardware(self) -> dict[str, Any]:

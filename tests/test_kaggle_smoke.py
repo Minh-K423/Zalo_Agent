@@ -341,7 +341,8 @@ def test_exhausted_budget_stops_subprocess(config, tmp_path):
         runtime.command(["must-not-execute"])
 
 
-def test_offline_bootstrap_uses_only_wheels(config, tmp_path, monkeypatch):
+@pytest.mark.parametrize("base_pip", [True, False])
+def test_offline_bootstrap_uses_only_wheels(config, tmp_path, monkeypatch, base_pip):
     runtime = smoke.VllmRuntime(config, tmp_path, time.monotonic())
     lock = ROOT / "configs/requirements-kaggle.in"
     commands = []
@@ -351,11 +352,19 @@ def test_offline_bootstrap_uses_only_wheels(config, tmp_path, monkeypatch):
         return json.dumps(smoke.read_pins(lock)) if "-c" in args else ""
 
     monkeypatch.setattr(runtime, "command", command)
+    monkeypatch.setattr(smoke, "find_spec", lambda name: object() if base_pip else None)
     runtime.prepare(tmp_path, lock)
-    install = commands[1]
+    create, install, _, check = commands
+    assert ("--without-pip" in create) is base_pip
+    if base_pip:
+        assert install[:5] == [smoke.sys.executable, "-m", "pip", "--python", create[-1]]
+    else:
+        assert install[:3] == [str(runtime.python), "-m", "pip"]
     assert "--isolated" in install
     assert "--no-index" in install
     assert "--only-binary=:all:" in install
+    assert install[install.index("--find-links") + 1] == str(tmp_path)
+    assert check == [*install[:install.index("install")], "check"]
 
 
 def test_server_exit_is_reported(config, tmp_path, monkeypatch):

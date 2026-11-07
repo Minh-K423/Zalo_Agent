@@ -92,6 +92,12 @@ the candidate fails; do not switch precision, checkpoint or hardware silently.
    Upload the complete `wheelhouse/`, including its lock, as another private
    Kaggle Dataset. PyTorch and CUDA dependencies make this asset large; check
    available disk space in both preparation and Kaggle environments.
+   If `venv` reports an `ensurepip` failure on Kaggle, create each environment
+   with `python -m venv --without-pip <env>` and use
+   `python -m pip --python <env>` in place of `<env>/bin/python -m pip`.
+   This uses the base image's pip (22.3 or newer) to manage the isolated
+   environment. The offline smoke runner uses the same approach when base pip
+   is available.
 5. Upload an application folder named `app/` containing only
    `src/zalo_aic_data/`, `configs/`, `prompts/`, and optionally these instructions.
    Import `notebooks/kaggle_smoke.ipynb` into Kaggle separately. Do not upload
